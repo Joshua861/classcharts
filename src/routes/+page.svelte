@@ -105,8 +105,8 @@
 	}
 </script>
 
-<div class="prose mx-auto px-5 dark:prose-invert">
-	{#if signedIn}
+{#if signedIn}
+	<div class="prose mx-auto px-5 dark:prose-invert">
 		{#if lessons.length !== 0}
 			<br />
 			{#each lessons as lesson}
@@ -120,9 +120,11 @@
 		{:else}
 			<p>Something went wrong.</p>
 		{/if}
-	{:else}
-		<div class="absolute flex h-screen w-screen justify-center align-middle">
-			<div class="my-auto">
+	</div>
+{:else}
+	<div class="prose dark:prose-invert">
+		<div class="absolute flex h-screen w-screen align-middle dark:prose-invert">
+			<div class="mx-auto my-auto">
 				<h1 class="text-center">Login</h1>
 				<Label>
 					Classcharts code
@@ -142,5 +144,5 @@
 				<Button on:click={signIn} class="w-full">Submit</Button>
 			</div>
 		</div>
-	{/if}
-</div>
+	</div>
+{/if}
