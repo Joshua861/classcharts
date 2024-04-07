@@ -118,7 +118,7 @@
 				<hr class="m-3" />
 			{/each}
 		{:else}
-			<p>Something went wrong.</p>
+			<p>No lessons today!</p>
 		{/if}
 	</div>
 {:else}

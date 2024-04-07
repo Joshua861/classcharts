@@ -2,12 +2,24 @@ import { StudentClient } from 'classcharts-api';
 
 let lessons;
 
+function getTodaysDate() {
+	const date = new Date();
+
+	let day = date.getDate();
+	let month = date.getMonth() + 1;
+	let year = date.getFullYear();
+
+	// This arrangement can be altered based on how we want the date's format to appear.
+	let currentDate = `${day}-${month}-${year}`;
+
+	return currentDate;
+}
 async function getLessons(code: string, DOB: string) {
 	const client = new StudentClient(code, DOB);
 	await client.login();
 
 	lessons = await client.getLessons({
-		date: '2024-04-08'
+		date: getTodaysDate()
 	});
 
 	return lessons;
