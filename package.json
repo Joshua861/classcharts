@@ -38,6 +38,7 @@
 	"type": "module",
 	"dependencies": {
 		"@internationalized/date": "^3.5.2",
+		"@sveltejs/adapter-static": "^3.0.1",
 		"bits-ui": "^0.21.2",
 		"classcharts-api": "^2.9.0",
 		"clsx": "^2.1.0",
