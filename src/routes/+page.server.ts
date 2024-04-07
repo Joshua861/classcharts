@@ -1,16 +1,18 @@
 import { StudentClient } from 'classcharts-api';
 
+export const prerender = false;
+
 let lessons;
 
 function getTodaysDate() {
 	const date = new Date();
 
-	let day = date.getDate();
-	let month = date.getMonth() + 1;
-	let year = date.getFullYear();
+	const day = date.getDate();
+	const month = date.getMonth() + 1;
+	const year = date.getFullYear();
 
 	// This arrangement can be altered based on how we want the date's format to appear.
-	let currentDate = `${day}-${month}-${year}`;
+	const currentDate = `${day}-${month}-${year}`;
 
 	return currentDate;
 }
