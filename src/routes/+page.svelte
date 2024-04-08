@@ -20,7 +20,7 @@
 	let lessons: any = [];
 	let error = false;
 
-	$: signedIn = $data.code !== '' && $data.DOB !== '';
+	$: signedIn = $data.code !== '' && $data.DOB !== '' && $data.code && $data.DOB;
 
 	onMount(() => {
 		if (signedIn) {
@@ -95,23 +95,47 @@
 
 			console.log(lessons);
 
-			if ((code && DOB) || !$data.code || !$data.DOB) {
-				$data.code = code;
-				$data.DOB = DOB;
-			}
-
-			data.set({
-				code: code,
-				DOB: DOB,
-				cache: JSON.stringify(lessons),
-				cacheDate: getTodaysDate()
-			});
+			if (code !== '' && DOB !== '' && DOB && code)
+				data.set({
+					code: code,
+					DOB: DOB,
+					cache: JSON.stringify(lessons),
+					cacheDate: getTodaysDate()
+				});
 		} else {
 			console.error('Failed to fetch lessons: ', response.statusText);
 			error = true;
 		}
 	}
 </script>
+
+<div class="fixed z-50 flex w-screen justify-end">
+	<Button
+		on:click={() => {
+			data.set({
+				...$data,
+				cache: '',
+				cacheDate: ''
+			});
+			invalidateAll();
+		}}
+		class="mt-auto"
+		variant="link">Clear cache</Button
+	>
+	<Button
+		on:click={() => {
+			data.set({
+				code: '',
+				DOB: '',
+				cache: '',
+				cacheDate: ''
+			});
+			invalidateAll();
+		}}
+		class="mt-auto"
+		variant="link">Delete all data</Button
+	>
+</div>
 
 {#if signedIn}
 	<div class="prose mx-auto px-5 dark:prose-invert">
@@ -164,20 +188,6 @@
 			<p>No lessons today!</p>
 		{/if}
 	</div>
-	{#if !error}
-		<div class="absolute inset-0 -z-10 flex h-screen w-screen justify-end align-bottom">
-			<Button
-				on:click={() => {
-					let newData = $data;
-					newData.cache = '';
-					data.set(newData);
-					invalidateAll();
-				}}
-				class="mt-auto"
-				variant="link">Clear cache</Button
-			>
-		</div>
-	{/if}
 {:else}
 	<div class="prose dark:prose-invert">
 		<div class="absolute flex h-screen w-screen align-middle dark:prose-invert">
