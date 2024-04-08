@@ -4,6 +4,9 @@
 	import { onMount } from 'svelte';
 	import { persisted } from 'svelte-persisted-store';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import { page } from '$app/stores';
+	import { invalidateAll } from '$app/navigation';
+	import * as Accordion from '$lib/components/ui/accordion';
 
 	const data = persisted('data', {
 		code: '',
@@ -15,6 +18,7 @@
 	let code: string, DOB: string;
 	let signedIn: boolean;
 	let lessons: any = [];
+	let error = false;
 
 	$: signedIn = $data.code !== '' && $data.DOB !== '';
 
@@ -42,7 +46,7 @@
 		console.log($data.cacheDate);
 		console.log(getTodaysDate());
 
-		if ($data.cache !== '' && $data.cacheDate == getTodaysDate()) {
+		if ($data.cache !== '' && $data.cacheDate === getTodaysDate()) {
 			lessons = JSON.parse($data.cache);
 			return;
 		}
@@ -91,16 +95,20 @@
 
 			console.log(lessons);
 
-			if (code && DOB) {
-				data.set({
-					code: code,
-					DOB: DOB,
-					cache: JSON.stringify(lessons),
-					cacheDate: getTodaysDate()
-				});
+			if ((code && DOB) || !$data.code || !$data.DOB) {
+				$data.code = code;
+				$data.DOB = DOB;
 			}
+
+			data.set({
+				code: code,
+				DOB: DOB,
+				cache: JSON.stringify(lessons),
+				cacheDate: getTodaysDate()
+			});
 		} else {
 			console.error('Failed to fetch lessons: ', response.statusText);
+			error = true;
 		}
 	}
 </script>
@@ -117,10 +125,59 @@
 				{lesson.teacher}
 				<hr class="m-3" />
 			{/each}
+		{:else if error}
+			<div class="bsod fixed inset-0 -z-10 flex h-screen w-screen bg-[#0827F5]">
+				<div class="mx-auto w-[90%] sm:w-[80%] md:w-[70%] lg:w-[60%] xl:w-[50%]">
+					<p class="m-0 text-[5em]">:(</p>
+					<p class="text-pretty text-xl">
+						Uh oh. There was an error getting lessons from Classcharts. I'm trying my best but it's
+						a private API (it's not made for people outside of Classcharts to use).
+					</p>
+					<p class="text-xl">0% complete</p>
+					<div class="flex">
+						<img
+							class="aspect-square w-[20%]"
+							src="/frame.png"
+							alt="QR code that leads to never going to give you up by rick astley."
+						/>
+						<div class="m-5">
+							<Accordion.Root>
+								<Accordion.Item value="item-1">
+									<Accordion.Trigger>Data (debug)</Accordion.Trigger>
+									<Accordion.Content>
+										<h4>$data</h4>
+										<pre>
+{JSON.stringify($data)}
+										</pre>
+										<h4>lessons</h4>
+										<pre>
+{JSON.stringify(lessons)}
+										</pre>
+									</Accordion.Content>
+								</Accordion.Item>
+							</Accordion.Root>
+						</div>
+					</div>
+				</div>
+			</div>
 		{:else}
 			<p>No lessons today!</p>
 		{/if}
 	</div>
+	{#if !error}
+		<div class="absolute inset-0 -z-10 flex h-screen w-screen justify-end align-bottom">
+			<Button
+				on:click={() => {
+					let newData = $data;
+					newData.cache = '';
+					data.set(newData);
+					invalidateAll();
+				}}
+				class="mt-auto"
+				variant="link">Clear cache</Button
+			>
+		</div>
+	{/if}
 {:else}
 	<div class="prose dark:prose-invert">
 		<div class="absolute flex h-screen w-screen align-middle dark:prose-invert">
